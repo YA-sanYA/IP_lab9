@@ -72,6 +72,7 @@ public class TextEditor {
             }
 
             currentLine.add(token);
+            currentLineSize += token.length();
         }
 
         if(!currentLine.isEmpty()) {
