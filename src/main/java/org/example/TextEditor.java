@@ -59,6 +59,8 @@ public class TextEditor {
     }
 
     public static ArrayList<String> editor(String text, int lineSize) {
+        if (lineSize <= 0) throw new IllegalArgumentException("длина строки должна быть натуральным числом");
+
         ArrayList<String> result = new ArrayList<>();
         ArrayList<String> tokens =  tokenizer(text, lineSize);
 
