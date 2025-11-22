@@ -34,7 +34,7 @@ public class TextEditor {
     }
 
     private static String concatenation(ArrayList<String> tokens, int spaceCount) {
-        StringBuilder result = new StringBuilder(tokens.getFirst());
+        StringBuilder result = new StringBuilder(tokens.get(0));
 
         if(tokens.size() == 1) {
             return result.toString();
