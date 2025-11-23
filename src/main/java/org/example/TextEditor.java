@@ -65,7 +65,8 @@ public class TextEditor {
         ArrayList<String> tokens =  tokenizer(text, lineSize);
 
         ArrayList<String> currentLine = new ArrayList<>();
-        int currentLineSize = 0;
+        currentLine.add(" ");
+        int currentLineSize = 1;
         for(String token : tokens) {
             if(currentLineSize + currentLine.size() + token.length() > lineSize) {
                 result.add(concatenation(currentLine, lineSize - currentLineSize));
@@ -77,9 +78,7 @@ public class TextEditor {
             currentLineSize += token.length();
         }
 
-        if(!currentLine.isEmpty()) {
-            result.add(String.join(" ", currentLine));
-        }
+        result.add(String.join(" ", currentLine));
 
         return result;
     }
