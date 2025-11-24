@@ -8,20 +8,34 @@ public class TextEditor {
 
     private static ArrayList<String> tokenizer(String text, int maxTokenSize) {
         ArrayList<String> tokens = new ArrayList<>();
-
-        Pattern pattern = Pattern.compile("\\S+");
-        Matcher matcher = pattern.matcher(text);
-
-        while(matcher.find()) {
-            String token = matcher.group();
-            while(token.length() > maxTokenSize) {
-                tokens.add(token.substring(0, maxTokenSize));
-                token = token.substring(maxTokenSize);
-            }
-            tokens.add(token);
+        if(!text.isEmpty()) {
+            tokens.add(" ");
         }
 
-        return  tokens;
+        String normalized = text.replace("\r\n", "\n").replace("\r", "\n");
+
+        String[] lines = normalized.split("\n");
+
+        for (String line : lines) {
+            if (line.isEmpty()) {
+                tokens.add(" ");
+            } else {
+                Matcher matcher = Pattern.compile("\\S+").matcher(line);
+
+                while (matcher.find()) {
+                    String token = matcher.group();
+
+                    while (token.length() > maxTokenSize) {
+                        tokens.add(token.substring(0, maxTokenSize));
+                        token = token.substring(maxTokenSize);
+                    }
+
+                    tokens.add(token);
+                }
+            }
+        }
+
+        return tokens;
     }
 
     private static String spaceMultiplier(int num) {
@@ -59,17 +73,48 @@ public class TextEditor {
     }
 
     public static ArrayList<String> editor(String text, int lineSize) {
-        if (lineSize <= 0) throw new IllegalArgumentException("длина строки должна быть натуральным числом");
+        if (lineSize <= 0)
+            throw new IllegalArgumentException("длина строки должна быть натуральным числом");
 
         ArrayList<String> result = new ArrayList<>();
-        ArrayList<String> tokens =  tokenizer(text, lineSize);
+        ArrayList<String> tokens = tokenizer(text, lineSize);
 
         ArrayList<String> currentLine = new ArrayList<>();
-        currentLine.add(" ");
-        int currentLineSize = 1;
-        for(String token : tokens) {
-            if(currentLineSize + currentLine.size() + token.length() > lineSize) {
+        int currentLineSize = 0;
+
+        String indent = " ";
+        boolean paragraphStart = true;
+        boolean firstParagraph = true;
+
+        for (String token : tokens) {
+
+            if (token.equals(" ")) {
+
+                if (!currentLine.isEmpty()) {
+                    result.add(String.join(" ", currentLine));
+                    currentLine.clear();
+                    currentLineSize = 0;
+                }
+
+                if (!firstParagraph) {
+                    result.add("");
+                }
+                firstParagraph = false;
+
+                paragraphStart = true;
+                continue;
+            }
+
+            if (paragraphStart) {
+                currentLine.add(indent);
+                currentLineSize += indent.length();
+                paragraphStart = false;
+            }
+
+            if (currentLineSize + currentLine.size() + token.length() > lineSize) {
+
                 result.add(concatenation(currentLine, lineSize - currentLineSize));
+
                 currentLine.clear();
                 currentLineSize = 0;
             }
@@ -78,7 +123,9 @@ public class TextEditor {
             currentLineSize += token.length();
         }
 
-        result.add(String.join(" ", currentLine));
+        if (!currentLine.isEmpty()) {
+            result.add(String.join(" ", currentLine));
+        }
 
         return result;
     }
